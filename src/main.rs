@@ -50,6 +50,17 @@ fn train_tensor(i: Vec<i64>) -> (Tensor, Tensor) {
     (train_data, train_lbl)
 }
 
+fn test(net: &ConvNN, vs: &nn::VarStore, epoch: i64) {
+    let (val_data, val_lbl) = data_and_lbl((TRAIN_SIZE as i64 +1 .. ALL_SIZE as i64 +1).collect());
+    let val_data = image_to_tensor(val_data.get_data(), val_data.get_data().len()/val_data.len(), RESIZE, RESIZE);
+    let val_lbl_len = val_lbl.len();
+    let val_lbl = labels_to_tensor(val_lbl, val_lbl_len, 1);
+    // compute accuracy 
+    let val_accuracy =
+        net.batch_accuracy_for_logits(&val_data, &val_lbl, vs.device(), 512);
+    println!("epoch: {:4} test acc: {:5.2}%", epoch, 100. * val_accuracy,);
+}
+
 fn main() {
     // let (train_data, _train_lbl) = data_and_lbl(0, BATCH_SIZE as usize);
     // let _train_data = image_to_tensor(train_data.get_data(), train_data.get_data().len()/(RESIZE*RESIZE), RESIZE, RESIZE);
@@ -80,15 +91,6 @@ fn main() {
             println!("尝试使用优化器对神经网络参数进行更新");
             opt.backward_step(&loss);
         }
-        {
-            let (val_data, val_lbl) = data_and_lbl((TRAIN_SIZE as i64 +1 .. ALL_SIZE as i64 +1).collect());
-            let val_data = image_to_tensor(val_data.get_data(), val_data.get_data().len()/val_data.len(), RESIZE, RESIZE);
-            let val_lbl_len = val_lbl.len();
-            let val_lbl = labels_to_tensor(val_lbl, val_lbl_len, 1);
-            // compute accuracy 
-            let val_accuracy =
-                net.batch_accuracy_for_logits(&val_data, &val_lbl, vs.device(), 1024);
-            println!("epoch: {:4} test acc: {:5.2}%", epoch, 100. * val_accuracy,);
-        }
+        test(&net, &vs, epoch);
     }
 }
