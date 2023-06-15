@@ -1,0 +1,3 @@
+[submodule "GlassCoverDefectDataset"]
+        path = GlassCoverDefectDataset
+        url = https://github.com/Johnhushwill/GlassCoverDefectDataset.git
