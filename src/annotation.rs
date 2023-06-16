@@ -28,7 +28,7 @@ impl Annotation {
     pub fn get_name(&self) -> Vec<u8> {
         let mut names = Vec::new();
         match &self.object {
-            None => names.push(4),
+            None => names.push(3),
             Some(o) => for name in o {
                 names.push(name.name);
             }
@@ -36,45 +36,49 @@ impl Annotation {
         names
     }
 
-    // pub fn get_name(&self) -> Vec<u8> {
-    //     let mut names = Vec::new();
-    //     for name in &self.object {
-    //         names.push(name.name);
-    //     }
-    //     names
-    // }
+    pub fn get_xmin(&self) -> Vec<i32> {
+        let mut xmins = Vec::new();
+        match &self.object {
+            None => xmins.push(0),
+            Some(o) => for xmin in o {
+                xmins.push(xmin.bndbox.xmin);
+            }
+        }
+        xmins
+    }
 
-//     pub fn get_xmin(&self) -> Vec<u32> {
-//         let mut xmins = Vec::new();
-//         for xmin in &self.object {
-//             xmins.push(xmin.bndbox.xmin);
-//         }
-//         xmins
-//     }
+    pub fn get_ymin(&self) -> Vec<i32> {
+        let mut ymins = Vec::new();
+        match &self.object {
+            None => ymins.push(0),
+            Some(o) => for ymin in o {
+                ymins.push(ymin.bndbox.ymin);
+            }
+        }
+        ymins
+    }
 
-//     pub fn get_ymin(&self) -> Vec<u32> {
-//         let mut ymins = Vec::new();
-//         for ymin in &self.object {
-//             ymins.push(ymin.bndbox.ymin);
-//         }
-//         ymins
-//     }
+    pub fn get_xmax(&self) -> Vec<i32> {
+        let mut xmaxs = Vec::new();
+        match &self.object {
+            None => xmaxs.push(0),
+            Some(o) => for xmax in o {
+                xmaxs.push(xmax.bndbox.xmax);
+            }
+        }
+        xmaxs
+    }
 
-//     pub fn get_xmax(&self) -> Vec<u32> {
-//         let mut xmaxs = Vec::new();
-//         for xmax in &self.object {
-//             xmaxs.push(xmax.bndbox.xmin);
-//         }
-//         xmaxs
-//     }
-
-//     pub fn get_ymax(&self) -> Vec<u32> {
-//         let mut ymaxs = Vec::new();
-//         for ymax in &self.object {
-//             ymaxs.push(ymax.bndbox.ymin);
-//         }
-//         ymaxs
-//     }
+    pub fn get_ymax(&self) -> Vec<i32> {
+        let mut ymaxs = Vec::new();
+        match &self.object {
+            None => ymaxs.push(0),
+            Some(o) => for ymax in o {
+                ymaxs.push(ymax.bndbox.ymax);
+            }
+        }
+        ymaxs
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -88,8 +92,8 @@ struct Object {
 
 #[derive(Serialize, Deserialize)]
 struct Bndbox {
-    xmin: u32,
-    ymin: u32,
-    xmax: u32,
-    ymax: u32,
+    xmin: i32,
+    ymin: i32,
+    xmax: i32,
+    ymax: i32,
 }

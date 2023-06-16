@@ -8,33 +8,31 @@ use crate::image::{Image, RESIZE};
 use annotation::Annotation;
 use convnn::ConvNN;
 use tch::{nn, nn::{ModuleT, OptimizerConfig}, Device, Kind, Tensor};
+// use rand::Rng;
 
 const N_EPOCHS: i64 = 10; // 迭代次数
 const TRAIN_SIZE: usize = 6760;
 const ALL_SIZE: usize = 8436;
 const BATCH_SIZE: i64 = 128;
-const XML_PATH: &str = "./GlassCoverDefectDataset/GlassCover_datset/Annotations/";
+const XML_PATH: &str = "/path/to/dl-glass/GlassCoverDefectDataset/GlassCover_datset/Annotations/";
 
+// 根据索引读取标注文件，返回图像和标注
 fn data_and_lbl(index: Vec<i64>) -> (Image, Vec<u8>) {
-    println!("尝试打开{}",format!("{}{}", XML_PATH, format!("{:0>6}", index[0]) + ".xml"));
+    // println!("尝试打开{}",format!("{}{}", XML_PATH, format!("{:0>6}", index[0]) + ".xml"));
     let mut annotation = Annotation::from_file(format!("{}{}", XML_PATH, format!("{:0>6}", index[0]) + ".xml")).expect("读取标注文件错误");
-    let mut data = Image::new(annotation.get_path()).expect("读取图像错误");
+    let x = 0; // rand::thread_rng().gen_range(0, annotation.get_xmin().len());
+    let mut data = Image::new(annotation.get_path(), annotation.get_xmin()[x], annotation.get_ymin()[x], annotation.get_xmax()[x], annotation.get_ymax()[x]).expect("读取图像错误");
 
     let mut lbl: Vec<u8> = Vec::new();
-    match annotation.get_name().get(1) {
-        None => lbl.push(annotation.get_name()[0]),
-        Some(_) => lbl.push(3),
-    }
+    lbl.push(annotation.get_name()[x]);
 
     for i in &index[1..] {
-        println!("尝试打开{}",format!("{}{}", XML_PATH, format!("{:0>6}", i) + ".xml"));
+        // println!("尝试打开{}",format!("{}{}", XML_PATH, format!("{:0>6}", i) + ".xml"));
         annotation = Annotation::from_file(format!("{}{}", XML_PATH, format!("{:0>6}", i) + ".xml")).expect("读取标注文件错误");
-        data.extend(annotation.get_path()).expect("读取图像错误");
+        // x = rand::thread_rng().gen_range(0, annotation.get_xmin().len());
+        data.extend(annotation.get_path(), annotation.get_xmin()[x], annotation.get_ymin()[x], annotation.get_xmax()[x], annotation.get_ymax()[x]).expect("读取图像错误");
 
-        match annotation.get_name().get(1) {
-            None => lbl.push(annotation.get_name()[0]),
-            Some(_) => lbl.push(3),
-        }
+        lbl.push(annotation.get_name()[x])
     }
     println!("Data length is {}", data.get_data().len());
     (data, lbl)
@@ -76,19 +74,19 @@ fn main() {
         // let (train_data, train_lbl) = train_tensor(i);
             // generate random idxs for batch size 
             // run all the images divided in batches  -> for loop
-        for _i in 1..n_it {
-            println!("尝试生成随机梯度下降索引");
+        for i in 1..n_it {
+            println!("（{}，{}）尝试生成随机梯度下降索引", epoch, i);
             let batch_idxs = generate_random_index(TRAIN_SIZE as i64, BATCH_SIZE);
-            println!("尝试选择一批数据并将其转换为浮点类型");
+            println!("（{}，{}）尝试选择一批数据并将其转换为浮点类型", epoch, i);
             let (train_data, train_lbl) = train_tensor(batch_idxs.iter::<i64>().unwrap().collect());
             // let batch_images = train_data.index_select(0, &batch_idxs).to_device(vs.device()).to_kind(Kind::Float);
             let batch_images = train_data.to_device(vs.device()).to_kind(Kind::Float);
-            println!("尝试选择一批标注并将其转换为整数类型");
+            println!("（{}，{}）尝试选择一批标注并将其转换为整数类型", epoch, i);
             let batch_lbls = train_lbl.to_device(vs.device()).to_kind(Kind::Int64);
-            println!("尝试对批量图像数据进行前向传播，并计算交叉熵损失");
+            println!("（{}，{}）尝试对批量图像数据进行前向传播，并计算交叉熵损失", epoch, i);
             // compute the loss 
             let loss = net.forward_t(&batch_images, true).cross_entropy_for_logits(&batch_lbls);
-            println!("尝试使用优化器对神经网络参数进行更新");
+            println!("（{}，{}）尝试使用优化器对神经网络参数进行更新", epoch, i);
             opt.backward_step(&loss);
         }
         test(&net, &vs, epoch);
