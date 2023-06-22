@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use serde_xml_rs::from_reader;
+use crate::image::RESIZE;
 
 #[derive(Serialize, Deserialize)]
 pub struct Annotation {
@@ -36,45 +37,45 @@ impl Annotation {
         names
     }
 
-    pub fn get_xmin(&self) -> Vec<i32> {
+    pub fn get_xmin(&self) -> Vec<f32> {
         let mut xmins = Vec::new();
         match &self.object {
-            None => xmins.push(0),
+            None => xmins.push(0.0),
             Some(o) => for xmin in o {
-                xmins.push(xmin.bndbox.xmin);
+                xmins.push(xmin.bndbox.xmin / RESIZE as f32);
             }
         }
         xmins
     }
 
-    pub fn get_ymin(&self) -> Vec<i32> {
+    pub fn get_ymin(&self) -> Vec<f32> {
         let mut ymins = Vec::new();
         match &self.object {
-            None => ymins.push(0),
+            None => ymins.push(0.0),
             Some(o) => for ymin in o {
-                ymins.push(ymin.bndbox.ymin);
+                ymins.push(ymin.bndbox.ymin / RESIZE as f32);
             }
         }
         ymins
     }
 
-    pub fn get_xmax(&self) -> Vec<i32> {
+    pub fn get_xmax(&self) -> Vec<f32> {
         let mut xmaxs = Vec::new();
         match &self.object {
-            None => xmaxs.push(0),
+            None => xmaxs.push(0.0),
             Some(o) => for xmax in o {
-                xmaxs.push(xmax.bndbox.xmax);
+                xmaxs.push(xmax.bndbox.xmax / RESIZE as f32);
             }
         }
         xmaxs
     }
 
-    pub fn get_ymax(&self) -> Vec<i32> {
+    pub fn get_ymax(&self) -> Vec<f32> {
         let mut ymaxs = Vec::new();
         match &self.object {
-            None => ymaxs.push(0),
+            None => ymaxs.push(0.0),
             Some(o) => for ymax in o {
-                ymaxs.push(ymax.bndbox.ymax);
+                ymaxs.push(ymax.bndbox.ymax / RESIZE as f32);
             }
         }
         ymaxs
@@ -92,8 +93,8 @@ struct Object {
 
 #[derive(Serialize, Deserialize)]
 struct Bndbox {
-    xmin: i32,
-    ymin: i32,
-    xmax: i32,
-    ymax: i32,
+    xmin: f32,
+    ymin: f32,
+    xmax: f32,
+    ymax: f32,
 }
