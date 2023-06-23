@@ -12,7 +12,7 @@ pub struct Image {
 
 impl Image {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
-        let img = Reader::open(path)?.decode()?.into_rgb8();
+        let img = Reader::open(path)?.decode()?.into_luma8();
         let resized_img = imageops::resize(&img, RESIZE as u32, RESIZE as u32, imageops::FilterType::Lanczos3);
         let d: Vec<u8> = resized_img.into_raw();
         let len = d.len();
@@ -30,7 +30,7 @@ impl Image {
     }
 
     pub fn extend<P: AsRef<Path>>(&mut self, path: P) -> Result<(), Box<dyn std::error::Error>> {
-        let img = Reader::open(path)?.decode()?.into_rgb8();
+        let img = Reader::open(path)?.decode()?.into_luma8();
         let resized_img = imageops::resize(&img, RESIZE as u32, RESIZE as u32, imageops::FilterType::Lanczos3);
         let ri = resized_img.into_raw();
         self.data.extend(&ri);

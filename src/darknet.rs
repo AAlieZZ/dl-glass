@@ -243,7 +243,7 @@ impl Darknet {
 
     pub fn build_model(&self, vs: &nn::Path) -> Result<FuncT> {
         let mut blocks: Vec<(i64, Bl)> = vec![];
-        let mut prev_channels: i64 = 3;
+        let mut prev_channels: i64 = 1;
         for (index, block) in self.blocks.iter().enumerate() {
             let channels_and_bl = match block.block_type.as_str() {
                 "convolutional" => conv(vs / index, index, prev_channels, block)?,

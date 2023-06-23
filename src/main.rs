@@ -15,8 +15,8 @@ const N_EPOCHS: i64 = 10; // 迭代次数
 const TRAIN_SIZE: usize = 6760;
 const ALL_SIZE: usize = 8436;
 const BATCH_SIZE: i64 = 64;
-const XML_PATH: &str = "/path/to/dl-glass/GlassCoverDefectDataset/GlassCover_datset/Annotations/";
-const CONFIG_NAME: &str = "/path/to/dl-glass/src/yolo-v3.cfg";
+const XML_PATH: &str = "/home/aliez/dl-glass/GlassCoverDefectDataset/GlassCover_datset/Annotations/";
+const CONFIG_NAME: &str = "/home/aliez/dl-glass/src/yolo-v3.cfg";
 
 // 根据索引读取标注文件，返回图像和标注
 fn data_and_lbl(index: Vec<i64>) -> (Image, Vec<f32>) {
